@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Students</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .students-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .table-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-box {
+            position: relative;
+            min-width: 250px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #34495e;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .credit-score {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .credit-score.high { background-color: #d5f5e3; color: #27ae60; }
+        .credit-score.medium { background-color: #fef9e7; color: #f39c12; }
+        .credit-score.low { background-color: #fadbd8; color: #e74c3c; }
+        .action-buttons { display: flex; gap: 10px; }
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            background-color: #3498db;
+            transition: all 0.2s;
+        }
+        .btn-icon.secondary { background-color: #2ecc71; }
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .top-button {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .top-button button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .top-button button:hover {
+            background-color: #1e8449;
+        }
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: white;
+            margin: 100px auto;
+            padding: 20px;
+            width: 300px;
+            border-radius: 8px;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+        }
+        .modal-content select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+        .modal-content button {
+            padding: 8px 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="students-card">
+        <div class="top-button">
+            <button onclick="openBulkSendModal()">📤 Send All Reports to Parents</button>
+        </div>
+
+        <div class="table-header">
+            <h3><i class="fas fa-user-graduate"></i> Student List</h3>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search students..." onkeyup="filterStudents()">
+            </div>
+        </div>
+
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>App ID</th>
+                    <th>Name</th>
+                    <th>Credit Score</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.app_id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>
+                        <span class="credit-score {% if student.credit >= 75 %}high{% elif student.credit >= 50 %}medium{% else %}low{% endif %}">
+                            {{ '%.2f'|format(student.credit) }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/mentor/view_report/{{ student.app_id }}" class="btn-icon" title="View Report">
+                                <i class="fas fa-file-alt"></i>
+                            </a>
+                            <a href="/mentor/marks/{{ student.app_id }}" class="btn-icon secondary" title="Add/Edit Marks">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="javascript:void(0);" class="btn-icon" style="background-color:#e67e22;" title="Send Report to Parent" onclick="openSendReportModal('{{ student.app_id }}')">
+                                <i class="fas fa-paper-plane"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="sendReportModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()" style="float: right; font-size: 20px; cursor: pointer;">&times;</span>
+            <h3>Send Report to Parent</h3>
+            <form method="POST" action="/mentor/send_to_parent" onsubmit="return submitSendReport();">
+                <input type="hidden" id="modalAppId" name="app_id">
+                <label for="modalMonth">Select Month:</label>
+                <select id="modalMonth" name="month" required>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+                <label for="modalYear">Select Year:</label>
+                <select id="modalYear" name="year" required>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+                <button type="submit" style="margin-top: 10px;">📤 Send Report</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bulkSendModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()" style="float: right; font-size: 20px; cursor: pointer;">&times;</span>
+            <h3>Send All Students' Reports</h3>
+            <form method="POST" action="/mentor/send_bulk_reports">
+                <label for="bulkMonth">Select Month:</label>
+                <select id="bulkMonth" name="month" required>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+                <label for="bulkYear">Select Year:</label>
+                <select id="bulkYear" name="year" required>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+                <button type="submit" style="margin-top: 10px;">📧 Send All Reports</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function filterStudents() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('studentTable');
+            const tr = table.getElementsByTagName('tr');
+            for (let i = 1; i < tr.length; i++) {
+                const tdName = tr[i].getElementsByTagName('td')[1];
+                const tdAppId = tr[i].getElementsByTagName('td')[0];
+                if (tdName || tdAppId) {
+                    const txtValueName = tdName.textContent || tdName.innerText;
+                    const txtValueAppId = tdAppId.textContent || tdAppId.innerText;
+                    if (txtValueName.toUpperCase().indexOf(filter) > -1 || txtValueAppId.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        function openSendReportModal(appId) {
+            document.getElementById("modalAppId").value = appId;
+            document.getElementById("sendReportModal").style.display = "block";
+        }
+
+        function openBulkSendModal() {
+            document.getElementById("bulkSendModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("sendReportModal").style.display = "none";
+            document.getElementById("bulkSendModal").style.display = "none";
+        }
+
+        function submitSendReport() {
+            closeModal();
+            return true;
+        }
+    </script>
+</body>
+</html>

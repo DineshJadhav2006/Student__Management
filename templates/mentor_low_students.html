@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students Who Need Attention (Low Credit)</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f5f7fa;
+        }
+        h2 {
+            color: #007bff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background-color: white;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #3f51b5;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 15px;
+            background-color: #3f51b5;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-btn:hover {
+            background-color: #2c387e;
+        }
+    </style>
+</head>
+<body>
+    <h2>Students Who Need Attention <span style="font-size: 18px; color: #777;">(Low Credit)</span></h2>
+
+    <table>
+    <thead>
+        <tr>
+            <th>App ID</th>
+            <th>Name</th>
+            <th>Credit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in students %}
+        <tr onclick="window.location.href='/mentor/view_report/{{ entry.student.app_id }}'" style="cursor:pointer;">
+            <td>{{ entry.student.app_id }}</td>
+            <td>{{ entry.student.name }}</td>
+            <td>{{ '%.2f'|format(entry.credit) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+    <a href="/mentor/dashboard" class="back-btn">← Back to Dashboard</a>
+</body>
+</html>

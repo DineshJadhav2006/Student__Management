@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Marks</title>
+     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form, table {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        a.delete-btn {
+            color: red;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add Marks for {{ student.name }} ({{ student.app_id }})</h2>
+    <form method="post" action="/mentor/add_marks">
+        <input type="hidden" name="app_id" value="{{ student.app_id }}">
+        Subject: <input type="text" name="subject" required><br>
+        Month: <input type="text" name="month" required><br>
+        Obtained: <input type="number" name="obtained" required><br>
+        Total: <input type="number" name="total" required><br>
+        <button type="submit">Submit</button>
+    </form>
+    <title>Manage Students</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1>Manage Students</h1>
+
+    <form action="/mentor/add_student" method="post">
+        <h3>Add New Student</h3>
+        <input type="text" name="app_id" placeholder="App ID" required>
+        <input type="text" name="name" placeholder="Name" required>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <h3>Student List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>App ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.app_id }}</td>
+                <td>{{ student.name }}</td>
+                <td>
+                    <a href="/mentor/delete_student/{{ student.app_id }}" class="delete-btn">Delete</a>
+                    &nbsp;|&nbsp;
+                    <a href="/mentor/fill_marks/{{ student.app_id }}">Fill Marks</a>
+                    &nbsp;|&nbsp;
+                    <a href="/mentor/fill_attendance/{{ student.app_id }}">Fill Attendance</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/mentor/dashboard">⬅ Back to Dashboard</a>
+</body>
+</html>
+</body>
+</html>
