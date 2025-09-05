@@ -1,0 +1,15 @@
+# fastapi
+# uvicorn
+# sqlalchemy
+# python-dotenv
+# mysql-connector-python
+# pdfkit
+# pip install 'passlib[bcrypt]'
+
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+mysql-connector-python
+pdfkit
+passlib[bcrypt]
