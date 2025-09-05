@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - Login</title>
+    <style>
+        :root {
+            --primary: #4a6bff;
+            --student: #6c5ce7;
+            --mentor: #00b894;
+            --admin: #d63031;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+ 
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden; /* This will remove the scroll bar */
+}
+ 
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 1000px;
+            overflow: hidden;
+            display: flex;
+            min-height: 600px;
+        }
+ 
+        .welcome-section {
+            position: relative;
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+ 
+        .welcome-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/the baap company.png') center/cover no-repeat;
+            opacity: 0.3; /* Transparent background image */
+            z-index: 0;
+        }
+ 
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 20px;
+        }
+ 
+        .system-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary); /* Changed to primary color */
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+ 
+        .system-tagline {
+            font-size: 1.2rem;
+            color: var(--dark); /* Darker color for better visibility */
+            font-weight: 400;
+            max-width: 90%;
+            margin: 0 auto 30px;
+            /* background-color: rgba(255, 255, 255, 0.7); Semi-transparent white background */
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+ 
+        /* .welcome-text {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            /* padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        } */ */
+ 
+        .welcome-text h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+ 
+        .welcome-text p {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            line-height: 1.6;
+            color: var(--dark);
+            max-width: 90%;
+            margin: 0 auto;
+        }
+ 
+        /* Rest of your existing styles remain the same */
+        .login-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+ 
+        .role-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+       
+        .role-btn {
+            padding: 12px 0;
+            flex: 1;
+            text-align: center;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+       
+        .role-btn.active {
+            color: var(--primary);
+        }
+       
+        .role-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+       
+        .role-btn.student:hover {
+            color: var(--student);
+        }
+       
+        .role-btn.mentor:hover {
+            color: var(--mentor);
+        }
+       
+        .role-btn.admin:hover {
+            color: var(--admin);
+        }
+       
+        .login-form {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
+        }
+       
+        .login-form.active {
+            display: flex;
+        }
+       
+        .login-form h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            text-align: center;
+        }
+       
+        .form-group {
+            margin-bottom: 20px;
+        }
+       
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+       
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+       
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.2);
+        }
+       
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+       
+        .submit-btn:hover {
+            background: #3a5bef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+       
+        .student .submit-btn {
+            background: var(--student);
+        }
+       
+        .student .submit-btn:hover {
+            background: #5b4bcf;
+        }
+       
+        .mentor .submit-btn {
+            background: var(--mentor);
+        }
+       
+        .mentor .submit-btn:hover {
+            background: #00a884;
+        }
+       
+        .admin .submit-btn {
+            background: var(--admin);
+        }
+       
+        .admin .submit-btn:hover {
+            background: #c52a2a;
+        }
+       
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+       
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+       
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+           
+            .welcome-section {
+                padding: 30px 20px;
+                min-height: 300px;
+            }
+ 
+            .system-title {
+                font-size: 2rem;
+            }
+ 
+            .system-tagline {
+                font-size: 1rem;
+            }
+           
+            .login-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="welcome-section">
+            <div class="welcome-bg"></div>
+            <div class="welcome-content">
+                <h1 class="system-title">Student Management System</h1>
+                <p class="system-tagline">Empowering educational institutions with comprehensive student lifecycle management</p>
+               
+                <div class="welcome-text">
+                    <!-- <h1>Welcome Back!</h1>
+                    <p>Please select your role and login to access your personalized dashboard. We're glad to have you back!</p> -->
+                </div>
+            </div>
+        </div>
+       
+        <div class="login-section">
+            <!-- Your existing login form code remains the same -->
+            <div class="role-selector">
+                <button class="role-btn student active" onclick="showForm('student')">
+                    <i class="fas fa-graduation-cap role-icon"></i>
+                    Student
+                </button>
+                <button class="role-btn mentor" onclick="showForm('mentor')">
+                    <i class="fas fa-chalkboard-teacher role-icon"></i>
+                    Mentor
+                </button>
+                <button class="role-btn admin" onclick="showForm('admin')">
+                    <i class="fas fa-user-cog role-icon"></i>
+                    Admin
+                </button>
+            </div>
+           
+            <!-- Student Login -->
+            <form id="student" class="login-form active" method="POST" action="/login/student">
+                <h2>Student Login</h2>
+                <div class="form-group">
+                    <label for="student-app-id">Application ID</label>
+                    <input type="text" id="student-app-id" name="app_id" placeholder="Enter your application ID" required>
+                </div>
+                <div class="form-group">git add frontend
+git commit -m "Fixed frontend folder tracking issue"
+git push origin main
+
+                    <label for="student-name">Name</label>
+                    <input type="text" id="student-name" name="name" placeholder="Enter your name" required>
+                </div>
+                <button type="submit" class="submit-btn">Login as Student</button>
+            </form>
+           
+            <!-- Mentor Login -->
+            <form id="mentor" class="login-form" method="POST" action="/login/mentor">
+                <h2>Mentor Login</h2>
+                <div class="form-group">
+                    <label for="mentor-email">Email</label>
+                    <input type="email" id="mentor-email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="mentor-password">Password</label>
+                    <input type="password" id="mentor-password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login as Mentor</button>
+            </form>
+           
+            <!-- Admin Login -->
+            <form id="admin" class="login-form" method="POST" action="/login/admin">
+                <h2>Admin Login</h2>
+                <div class="form-group">
+                    <label for="admin-username">Username</label>
+                    <input type="text" id="admin-username" name="username" placeholder="Enter admin username" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" name="password" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login as Admin</button>
+            </form>
+        </div>
+    </div>
+ 
+    <script>
+        function showForm(role) {
+            // Update active button
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.role-btn.${role}`).classList.add('active');
+           
+            // Update active form
+            document.querySelectorAll('.login-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(role).classList.add('active');
+           
+            // Add role class to login section for color theming
+            document.querySelector('.login-section').className = 'login-section ' + role;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard | Student Credit Evaluation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            overflow: hidden; /* Prevent body scrolling */
+        }
+        
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-header h2 i {
+            color: var(--success);
+        }
+        
+        .sidebar-menu {
+            padding: 0 10px;
+        }
+        
+        .menu-item {
+            margin-bottom: 4px;
+        }
+        
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .menu-item a:hover, .menu-item a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .menu-item a i {
+            margin-right: 10px;
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto; /* Allow scrolling only for main content */
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header h1 i {
+            color: var(--primary);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-profile img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+        
+        .user-profile .user-info {
+            text-align: right;
+        }
+        
+        .user-profile .user-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .user-profile .user-role {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-card .stat-title {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stat-card .stat-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        
+        .stat-card .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-card .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Upload Card */
+        .upload-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .upload-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .upload-card h3 i {
+            color: var(--primary);
+        }
+        
+        .upload-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .file-input {
+            flex: 1;
+            position: relative;
+        }
+        
+        .file-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .file-input input:hover {
+            border-color: var(--primary);
+            background-color: #f5f7ff;
+        }
+        
+        .file-input label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            color: #666;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .upload-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Students Table */
+        .students-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 150px); /* Adjust height to fit viewport */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .students-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .students-card h3 i {
+            color: var(--primary);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        /* Scrollable table container */
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background-color: #f8f9fa;
+        }
+        
+        .credit-score {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .credit-score.high {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .credit-score.medium {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .credit-score.low {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .btn-icon:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .btn-icon.secondary {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+        
+        .btn-icon.secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 15px 0;
+            }
+            
+            .main-content {
+                padding: 15px;
+                height: auto;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .students-card {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i> CreditEval</h2>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-item">
+                    <a href="#" class="active" id="dashboardLink">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="#" id="studentsLink">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    
+                </div>
+                <div class="menu-item">
+                    
+                </div>
+                <div class="menu-item">
+                    
+                </div>
+                <div class="menu-item">
+                    <a href="/logout">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Logout</span>
+</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-chalkboard-teacher"></i> Mentor Dashboard</h1>
+                
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name={{ mentor.email.split('@')[0] }}&background=random" alt="User">
+                    <div class="user-info">
+                        <div class="user-name">{{ mentor.email.split('@')[0] }}</div>
+                        <div class="user-role">Mentor</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content (Visible by default) -->
+            <div id="dashboardContent">
+                <!-- Stats Cards -->
+                <div class="stats-container">
+                    <div class="stat-card" onclick="window.location.href='/mentor/students/all'">
+                        <div class="stat-title">
+                            <i class="fas fa-users"></i>
+                            Total Students
+                        </div>
+                        <div class="stat-value">{{ students|length }}</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            <i class="fas fa-star"></i>
+                            Average Credit
+                        </div>
+                        <div class="stat-value">
+                            {% set avg_credit = students|map(attribute='credit')|sum / students|length if students|length > 0 else 0 %}
+                            {{ "%.1f"|format(avg_credit) }}
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/mentor/students/top'">
+                        <div class="stat-title">
+                            <i class="fas fa-chart-line"></i>
+                            Top Performers
+                        </div>
+                        <div class="stat-value">
+                            {% set top_students = students|sort(attribute='credit', reverse=True)|list %}
+                            {{ top_students[:5]|length }}
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> High credit students
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/mentor/students/low'">
+                        <div class="stat-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Needs Attention
+                        </div>
+                        <div class="stat-value">
+                            {% set low_students = students|selectattr('credit', '<=', 50)|list %}
+                            {{ low_students[:5]|length }}
+                        </div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> Low credit students
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Attendance Card -->
+                <div class="upload-card">
+                    <h3><i class="fas fa-file-upload"></i> Upload Attendance</h3>
+                    <form id="attendanceForm" action="/upload_attendance_excel" method="post" enctype="multipart/form-data" class="upload-form">
+                        <div class="form-group">
+                            <label for="attendance_file">Select Excel File</label>
+                            <input type="file" id="attendance_file" name="attendance_file" class="file-upload-input" accept=".xlsx,.xls" required>
+                            <label for="attendance_file" class="file-upload-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span id="fileName">Choose Excel file...</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selected_month">Select Month</label>
+                            <select name="selected_month" id="selected_month" required>
+                                <option value="" disabled selected>Select month</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selected_year">Enter Year</label>
+                            <input type="number" name="selected_year" id="selected_year" min="2000" max="2100" value="2024" required>
+                        </div>
+
+                        <button type="submit" class="upload-btn" id="uploadBtn">
+                            <span id="uploadText">Upload Attendance</span>
+                            <span id="uploadSpinner" class="spinner" style="display: none;">
+                                <i class="fas fa-spinner"></i>
+                            </span>
+                        </button>
+                    </form>
+                    <div id="uploadStatus" class="status-message"></div>
+                </div>
+
+                <!-- Upload Marks Card -->
+                <div class="upload-card">
+                    <h3><i class="fas fa-file-upload"></i> Upload Monthly Marks</h3>
+                    <form id="marksForm" action="/upload_marks_excel" method="post" enctype="multipart/form-data" class="upload-form">
+                        <div class="form-group">
+                            <label for="marks_file">Select Excel File</label>
+                            <input type="file" id="marks_file" name="marks_file" class="file-upload-input" accept=".xlsx" required>
+                            <label for="marks_file" class="file-upload-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span id="marksFileName">Choose Excel file...</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="marks_month">Select Month</label>
+                            <select name="selected_month" id="marks_month" required>
+                                <option value="" disabled selected>Select month</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="marks_year">Enter Year</label>
+                            <input type="number" name="selected_year" id="marks_year" min="2000" max="2100" value="2024" required>
+                        </div>
+
+                        <button type="submit" class="upload-btn" id="marksUploadBtn">
+                            <span id="marksUploadText">Upload Marks</span>
+                            <span id="marksUploadSpinner" class="spinner" style="display: none;">
+                                <i class="fas fa-spinner"></i>
+                            </span>
+                        </button>
+                    </form>
+                    <div id="marksUploadStatus" class="status-message"></div>
+                </div>
+            </div>
+            
+            <!-- Students Content (Hidden by default) -->
+            <div id="studentsContent" style="display: none;">
+                <!-- Students Table Card -->
+                <div class="students-card">
+                    <div class="table-header">
+                        <h3><i class="fas fa-user-graduate"></i> Student List</h3>
+                        
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search students..." onkeyup="filterStudents()">
+                        </div>
+                    </div>
+                    
+                    <!-- Scrollable container for the table -->
+                    <div class="table-container">
+                        <table id="studentTable">
+                            <thead>
+                                <tr>
+                                    <th>App ID</th>
+                                    <th>Name</th>
+                                    <th>Credit Score</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.app_id }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td>
+                                        <span class="credit-score 
+                                            {% if student.credit >= 75 %}high
+                                            {% elif student.credit >= 50 %}medium
+                                            {% else %}low
+                                            {% endif %}">
+                                            {{ student.credit }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/mentor/view_report/{{ student.app_id }}" class="btn-icon" title="View Report">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            <a href="/mentor/marks/{{ student.app_id }}" class="btn-icon secondary" title="Add/Edit Marks">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function logoutUser(e) {
+            e.preventDefault();
+            window.location.href = "./login.html";
+        }
+
+        // Toggle between dashboard and students view
+        document.getElementById('dashboardLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('studentsContent').style.display = 'none';
+            document.getElementById('dashboardLink').classList.add('active');
+            document.getElementById('studentsLink').classList.remove('active');
+        });
+        
+        document.getElementById('studentsLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('studentsContent').style.display = 'block';
+            document.getElementById('dashboardLink').classList.remove('active');
+            document.getElementById('studentsLink').classList.add('active');
+        });
+        
+        function filterStudents() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#studentTable tbody tr");
+            
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const appId = row.cells[0].textContent.toLowerCase();
+                
+                if (name.includes(input) || appId.includes(input)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        
+        // Update file input labels when files are selected
+        document.getElementById('attendance_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "Choose Excel file...";
+            document.getElementById('fileName').textContent = fileName;
+        });
+        
+        document.getElementById('marks_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "Choose Excel file...";
+            document.getElementById('marksFileName').textContent = fileName;
+        });
+        
+        // Add animation to stat cards on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Set current month as default for both forms
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            const currentMonth = new Date().getMonth();
+            document.getElementById('selected_month').value = months[currentMonth];
+            document.getElementById('marks_month').value = months[currentMonth];
+        });
+    </script>
+</body>
+</html>

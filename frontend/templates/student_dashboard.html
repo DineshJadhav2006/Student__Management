@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #43aa8b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h2 {
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .header .app-id {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .card-header i {
+            color: var(--accent);
+            font-size: 20px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .attendance-present .stat-icon {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+        }
+        
+        .attendance-absent .stat-icon {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: var(--danger);
+        }
+        
+        .stat-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        
+        .month-selector {
+            margin-bottom: 20px;
+        }
+        
+        .month-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .month-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .month-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(248, 150, 30, 0.2);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: var(--danger);
+        }
+
+        /* New styles for report sections */
+        .report-section {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .report-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .report-section h3 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .report-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-form {
+                grid-template-columns: 1fr;
+            }
+            .header .btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.header .btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: none;
+    box-shadow: none;
+}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<div class="header">
+    <h2><i class="fas fa-user-graduate"></i> Welcome, {{ student.name }}</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="app-id">App ID: {{ student.app_id }}</div>
+        <a href="/logout" class="btn" style="text-decoration: none;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+        
+        <div class="stats-container">
+            <div class="stat-card attendance-present">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>Days Present</h4>
+                    <p>{{ attendance | selectattr("status", "equalto", "Present") | list | length }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card attendance-absent">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>Days Absent</h4>
+                    <p>{{ attendance | selectattr("status", "equalto", "Absent") | list | length }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card" style="grid-column: span 8;">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Monthly Subject-wise Performance</h3>
+                </div>
+                
+                <div class="month-selector">
+                    {% for month in monthly_data.keys() %}
+                    <button class="month-btn {% if loop.first %}active{% endif %}" onclick="showMonth('{{ month }}')">{{ month }}</button>
+                    {% endfor %}
+                </div>
+                
+                {% for month, data in monthly_data.items() %}
+                <div class="month-content" id="{{ month }}" {% if not loop.first %}style="display:none;"{% endif %}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks Obtained</th>
+                                <th>Total Marks</th>
+                                <th>Credit</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in data.subjects %}
+                            <tr>
+                                <td>{{ item.subject }}</td>
+                                <td>{{ item.obtained }}</td>
+                                <td>{{ item.total }}</td>
+                                <td>{{ item.credit }}</td>
+                                <td>
+                                    {% set percentage = (item.obtained / item.total * 100) if item.total > 0 else 0 %}
+                                    {% if percentage >= 75 %}
+                                        <span class="badge badge-success">Excellent</span>
+                                    {% elif percentage >= 50 %}
+                                        <span class="badge badge-warning">Good</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Needs Improvement</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr style="font-weight: bold; background-color: #f0f5ff;">
+                                <td colspan="3">Average Credit</td>
+                                <td colspan="2">{{ data.average_credit }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="card" style="grid-column: span 4;">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Attendance Summary</h3>
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="attendancePieChart"></canvas>
+                </div>
+                
+                <table>
+    <tr>
+        <th>Month</th>
+        <th>Attendance %</th>
+    </tr>
+    {% for month_attendance in student_attendance %}
+    <tr class="attendance-row" data-month="{{ month_attendance.month }}">
+        <td>{{ month_attendance.month }}</td>
+        <td>
+            <div style="display: flex; align-items: center;">
+                <div style="width: 100%; background-color: #e0e0e0; border-radius: 5px; margin-right: 10px;">
+                    <div style="height: 8px; width: {{ month_attendance.attendance_percent }}%; background-color:
+                        {% if month_attendance.attendance_percent >= 75 %}
+                            #4cc9f0
+                        {% elif month_attendance.attendance_percent >= 50 %}
+                            #f8961e
+                        {% else %}
+                            #f72585
+                        {% endif %};
+                        border-radius: 5px;">
+                    </div>
+                </div>
+                {{ month_attendance.attendance_percent }}%
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+            </div>
+            
+            <div class="card" style="grid-column: span 6;">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Average Credit Trend</h3>
+                    <i class="fas fa-trend-up"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="creditChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card" style="grid-column: span 6;">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-column"></i> Monthly Attendance</h3>
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="attendanceBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+<div class="dashboard-grid" style="margin-top: 30px;">
+    <!-- Monthly Report Section -->
+    <div class="card" style="grid-column: span 6;">
+        <div class="card-header">
+            <h3><i class="fas fa-file-pdf"></i> Download Monthly Report</h3>
+        </div>
+        <form onsubmit="return downloadPDF();" class="report-form">
+            <div class="form-group">
+                <label for="month">Month</label>
+                <select id="month" name="month" required>
+                    <option disabled selected>-- Select Month --</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="year">Year</label>
+                <select id="year" name="year" required>
+                    <option disabled selected>-- Select Year --</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            
+            <div style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                <button type="submit" class="btn">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Yearly Report Section -->
+    
+</div>
+    <script>
+        // 🔍 Student filter
+        function filterStudents() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#studentTable tbody tr");
+            
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const appId = row.cells[0].textContent.toLowerCase();
+                
+                if (name.includes(input) || appId.includes(input)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // 📥 Yearly PDF download
+        function downloadYearlyReport(appId, form) {
+            const year = form.year.value;
+            const url = `/student/pdf_report/year/${appId}/${year}`;
+            window.open(url, "_blank");
+            return false;
+        }
+
+        // 📥 Updated: Monthly PDF download with Month + Year
+        function downloadPDF() {
+            const month = document.getElementById("month").value;
+            const year = document.getElementById("year").value;
+            const appId = "{{ student.app_id }}";
+
+            if (!month || !year) {
+                alert("Please select both Month and Year.");
+                return false;
+            }
+
+            const fullMonth = `${month} ${year}`;
+            const encodedMonth = encodeURIComponent(fullMonth); // important!
+            const url = `/student/pdf_report/month/${appId}/${encodedMonth}`;
+            window.open(url, "_blank");
+            return false; // prevent default form submit
+        }
+
+        // 📅 Monthly buttons switch
+        function showMonth(month) {
+            document.querySelectorAll('.month-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(month).style.display = 'block';
+
+            document.querySelectorAll('.month-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // 📊 Monthly average credit chart
+        const months = {{ monthly_data.keys() | list | tojson }};
+        const avgCredits = {{ monthly_data.values() | map(attribute='average_credit') | list | tojson }};
+
+        new Chart(document.getElementById('creditChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Average Credit',
+                    data: avgCredits,
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                    borderColor: 'rgba(67, 97, 238, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: 'white',
+                    pointBorderColor: 'rgba(67, 97, 238, 1)',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 10,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // 📊 Attendance Pie Chart
+        const attendancePie = new Chart(document.getElementById('attendancePieChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Present', 'Absent'],
+                datasets: [{
+                    label: 'Attendance',
+                    data: [
+                        {{ attendance | selectattr("status", "equalto", "Present") | list | length }},
+                        {{ attendance | selectattr("status", "equalto", "Absent") | list | length }}
+                    ],
+                    backgroundColor: ['#4cc9f0', '#f72585'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // 📊 Attendance % Bar Chart
+        const attBarChart = new Chart(document.getElementById('attendanceBarChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ attendance_percentages.keys() | list | safe }},
+                datasets: [{
+                    label: 'Attendance %',
+                    data: {{ attendance_percentages.values() | list | safe }},
+                    backgroundColor: function(context) {
+                        const value = context.raw;
+                        if (value >= 75) return '#4cc9f0';
+                        if (value >= 50) return '#f8961e';
+                        return '#f72585';
+                    },
+                    borderColor: function(context) {
+                        const value = context.raw;
+                        if (value >= 75) return '#3aa8d8';
+                        if (value >= 50) return '#e6871a';
+                        return '#e51a6f';
+                    },
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+    function showMonth(month) {
+        // Hide all month performance sections
+        const allMonthContents = document.querySelectorAll('.month-content');
+        allMonthContents.forEach(content => content.style.display = 'none');
+ 
+        // Show the selected month content
+        document.getElementById(month).style.display = 'block';
+ 
+        // Update active button style
+        const buttons = document.querySelectorAll('.month-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        const selectedBtn = [...buttons].find(btn => btn.textContent.trim() === month);
+        if (selectedBtn) selectedBtn.classList.add('active');
+ 
+        // Filter attendance rows
+        const attendanceRows = document.querySelectorAll('.attendance-row');
+        attendanceRows.forEach(row => {
+            if (row.dataset.month === month) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+ 
+    // Automatically show first month's data on load
+    window.onload = function () {
+        const firstMonthBtn = document.querySelector('.month-btn.active');
+        if (firstMonthBtn) {
+            showMonth(firstMonthBtn.textContent.trim());
+        }
+    }
+</script>
+</body>
+</html>

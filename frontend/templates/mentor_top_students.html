@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Top Performers</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h2 style="color: royalblue;">Top Performers (High Credit Students)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>App ID</th>
+                <th>Name</th>
+                <th>Credit Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.app_id }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ '%.2f'|format(student.credit) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
